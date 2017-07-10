@@ -117,6 +117,7 @@ Case 5 - Perspective
 
 Also, find a chart showing the per-class distribution of the examples after the data enhancement for the three main sets: the training, validation and test sets.  Several runs were performed to cover various percentages of the gap in the examples between each class and the class with the maximum number of examples.  This was repeated for each of the three main sets.  See below for the plots for the 25%, 50% and 75% coverage of the gap respectively.
 
+Dataset sizes at 25% gap coverage
 ![alt text][image3]
 
 Dataset sizes at 50% gap coverage
