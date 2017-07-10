@@ -23,9 +23,9 @@ The goals / steps of this project are the following:
 [image2]: ./images/code_gen_dist_imgs.png "Generate Distorted Images"
 [image3]: ./images/dataset_sizes_25pc.png "Enhanced Dataset 25%"
 [image4]: ./images/dataset_sizes_50pc.png "Enhanced Dataset 50%"
-[image5]: ./images/dataset_barchart_25.png "Enhanced Dataset 25%"
-[image6]: ./images/dataset_barchart_50.png "Enhanced Dataset 50%"
-[image7]: ./images/dataset_barchart_75.png "Enhanced Dataset 75%"
+[image5]: ./images/dataset_barchart_25pc.png "Enhanced Dataset 25%"
+[image6]: ./images/dataset_barchart_50pc.png "Enhanced Dataset 50%"
+[image7]: ./images/dataset_barchart_75pc.png "Enhanced Dataset 75%"
 
 [image8]:  ./images/sign1.jpg "Traffic Sign 1"
 [image9]:  ./images/sign2.jpg "Traffic Sign 2"
@@ -117,7 +117,6 @@ Case 5 - Perspective
 
 Also, find a chart showing the per-class distribution of the examples after the data enhancement for the three main sets: the training, validation and test sets.  Several runs were performed to cover various percentages of the gap in the examples between each class and the class with the maximum number of examples.  This was repeated for each of the three main sets.  See below for the plots for the 25%, 50% and 75% coverage of the gap respectively.
 
-Dataset sizes at 25% gap coverage
 ![alt text][image3]
 
 Dataset sizes at 50% gap coverage
