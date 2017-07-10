@@ -85,23 +85,51 @@ The original images were converted to grayscale from RGB and subsequently were n
 
 A series of examples are given below showcasing some of the applied distortions.
 
+Case 1 - Original
 ![alt text][image13]
+
+Case 1 - Affline Transformation
 ![alt text][image14]
+
+Case 2 - Original
 ![alt text][image15]
+
+Case 2 - Gaussian Blur
 ![alt text][image16]
+
+Case 3 - Original
 ![alt text][image17]
+
+Case 3 - Translation
 ![alt text][image18]
+
+Case 4 - Original
 ![alt text][image19]
+
+Case 4 - Rotation
 ![alt text][image20]
+
+Case 5 - Original
 ![alt text][image21]
+
+Case 5 - Perspective
 ![alt text][image22]
 
 Also, find a chart showing the per-class distribution of the examples after the data enhancement for the three main sets: the training, validation and test sets.  Several runs were performed to cover various percentages of the gap in the examples between each class and the class with the maximum number of examples.  This was repeated for each of the three main sets.  See below for the plots for the 25%, 50% and 75% coverage of the gap respectively.
 
+Dataset sizes at 25% gap coverage
 ![alt text][image3]
+
+Dataset sizes at 50% gap coverage
 ![alt text][image4]
+
+Dataset barchart at 25% gap coverage 
 ![alt text][image5]
+
+Dataset barchart at 50% gap coverage 
 ![alt text][image6]
+
+Dataset barchart at 75% gap coverage 
 ![alt text][image7]
 
 The final size of the sets post-enhancement were (25% case):
