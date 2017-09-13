@@ -11806,6 +11806,8 @@ div#notebook {
 <span class="kn">from</span> <span class="nn">moviepy.editor</span> <span class="k">import</span> <span class="n">VideoFileClip</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">HTML</span>
 
+<span class="kn">from</span> <span class="nn">scipy.ndimage.interpolation</span> <span class="k">import</span> <span class="n">shift</span>
+
 <span class="n">source</span><span class="o">=</span><span class="p">[]</span>
 </pre></div>
 
@@ -11903,7 +11905,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Color-Conversion-&amp;-Thresholding-Function">Color Conversion &amp; Thresholding Function<a class="anchor-link" href="#Color-Conversion-&amp;-Thresholding-Function">&#182;</a></h2>
+<h2 id="Color-Conversion-&amp;-Thresholding-Function-(HLS)">Color Conversion &amp; Thresholding Function (HLS)<a class="anchor-link" href="#Color-Conversion-&amp;-Thresholding-Function-(HLS)">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -11921,9 +11923,72 @@ div#notebook {
     <span class="n">L</span> <span class="o">=</span> <span class="n">hls</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">hls</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
 
-    <span class="c1">#thresh = (thresMin, thresMax)</span>
     <span class="n">binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
     <span class="n">binary</span><span class="p">[(</span><span class="n">S</span> <span class="o">&gt;</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">S</span> <span class="o">&lt;=</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">binary</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Color-Conversion-&amp;-Thresholding-Function-(LUV)">Color Conversion &amp; Thresholding Function (LUV)<a class="anchor-link" href="#Color-Conversion-&amp;-Thresholding-Function-(LUV)">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">ColorThresholdingLUV</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">thresh</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function converts from RGB to the LUV color space and returns a thresholded binary image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">luv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2Luv</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">luv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">luv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">luv</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">binary</span><span class="p">[(</span><span class="n">L</span> <span class="o">&gt;=</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">L</span> <span class="o">&lt;=</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">binary</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Color-Conversion-&amp;-Thresholding-Function-(LAB)">Color Conversion &amp; Thresholding Function (LAB)<a class="anchor-link" href="#Color-Conversion-&amp;-Thresholding-Function-(LAB)">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">ColorThresholdingLAB</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">thresh</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function converts from RGB to the LAB color space and returns a thresholded binary image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lab</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2Lab</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">binary</span><span class="p">[(</span><span class="n">B</span> <span class="o">&gt;</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">B</span> <span class="o">&lt;=</span> <span class="n">thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">binary</span>
 </pre></div>
 
@@ -12044,10 +12109,10 @@ div#notebook {
     <span class="c1"># Define the verticies for the masked region</span>
     <span class="n">imshape</span>  <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
     
-    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[(</span><span class="mi">80</span><span class="p">,</span><span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">80</span><span class="p">),</span> 
-                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">40</span><span class="p">,</span> <span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">80</span><span class="p">),</span> 
-                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">80</span><span class="p">,</span><span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[(</span><span class="mi">180</span><span class="p">,</span><span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span> <span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">80</span><span class="p">),</span> 
+                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">60</span><span class="p">,</span> <span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="o">+</span><span class="mi">80</span><span class="p">),</span> 
+                          <span class="p">(</span><span class="n">imshape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span><span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
     <span class="c1"># Initialize the mask</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>   
@@ -12454,48 +12519,64 @@ div#notebook {
     <span class="c1"># start scanning rows from the bottom of the image and identify the</span>
     <span class="c1"># pixel coordinates for a pair of lane line points closest to the bottom</span>
     <span class="n">src</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">srcTop</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">srcBottom</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">srcTop</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">srcBottom</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">margin</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">left_done</span>  <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">right_done</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">row_midpoint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">70</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">80</span><span class="p">),</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">row</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
-        <span class="n">left_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[:</span><span class="n">row_midpoint</span><span class="p">]</span>
-        <span class="n">right_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">row_midpoint</span><span class="p">:]</span>
+        <span class="n">left_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[:</span><span class="n">row_midpoint</span><span class="o">-</span><span class="n">margin</span><span class="p">]</span>
+        <span class="n">right_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">margin</span><span class="p">:]</span>
         <span class="n">left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">left_row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">right_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">right_row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">left_done</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">min_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">max_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">med_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="n">mean_left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_left_ind</span><span class="o">+</span><span class="n">max_left_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">srcBottom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">max_left_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">left_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">right_done</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>           
             <span class="n">min_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">max_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">mean_left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_left_ind</span><span class="o">+</span><span class="n">max_left_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">med_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
             <span class="n">mean_right_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_right_ind</span><span class="o">+</span><span class="n">max_right_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-            <span class="c1">#srcBottom = [[min_left_ind,i],[row_midpoint+max_right_ind,i]]</span>
-            <span class="k">if</span> <span class="n">row_midpoint</span> <span class="o">+</span> <span class="n">mean_right_ind</span> <span class="o">&gt;</span> <span class="n">mean_left_ind</span> <span class="o">+</span> <span class="n">margin</span><span class="p">:</span>
-                <span class="n">srcBottom</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mean_left_ind</span><span class="p">,</span><span class="n">i</span><span class="p">],[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">mean_right_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]]</span>
-                <span class="k">break</span>
+            <span class="n">srcBottom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">margin</span><span class="o">+</span><span class="n">min_right_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>            
+            <span class="n">right_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">right_done</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">left_done</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">break</span>
         
     <span class="c1"># start scanning rows from the top of the image and identify the</span>
     <span class="c1"># pixel coordinates for a pair of lane line points closest to the top</span>
     <span class="n">row_midpoint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">left_done</span>  <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">right_done</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">row</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span>
-        <span class="n">left_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[:</span><span class="n">row_midpoint</span><span class="p">]</span>
-        <span class="n">right_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">row_midpoint</span><span class="p">:]</span>
+        <span class="n">left_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[:</span><span class="n">row_midpoint</span><span class="o">-</span><span class="n">margin</span><span class="p">]</span>
+        <span class="n">right_row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">margin</span><span class="p">:]</span>
         <span class="n">left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">left_row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">right_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">right_row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">left_done</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">min_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">max_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">med_left_ind</span>  <span class="o">=</span> <span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">left_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="n">mean_left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_left_ind</span><span class="o">+</span><span class="n">max_left_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">srcTop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">max_left_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">left_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">right_done</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>           
             <span class="n">min_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">max_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">mean_left_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_left_ind</span><span class="o">+</span><span class="n">max_left_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">med_right_ind</span> <span class="o">=</span> <span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">right_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
             <span class="n">mean_right_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">min_right_ind</span><span class="o">+</span><span class="n">max_right_ind</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">row_midpoint</span> <span class="o">+</span> <span class="n">mean_right_ind</span> <span class="o">&gt;</span> <span class="n">mean_left_ind</span> <span class="o">+</span> <span class="n">margin</span><span class="p">:</span>
-                <span class="c1">#srcTop = [[min_left_ind,i],[row_midpoint+max_right_ind,i]]</span>
-                <span class="n">srcTop</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mean_left_ind</span><span class="p">,</span><span class="n">i</span><span class="p">],[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">mean_right_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]]</span>
-                <span class="k">break</span>
+            <span class="n">srcTop</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_midpoint</span><span class="o">+</span><span class="n">margin</span><span class="o">+</span><span class="n">min_right_ind</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>            
+            <span class="n">right_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">right_done</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">left_done</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="n">src</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">([</span><span class="n">srcTop</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">srcBottom</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">srcBottom</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">srcTop</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
     
     <span class="c1"># Extend source points to the top and bottom of the lane   </span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">srcTop</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">srcBottom</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -12505,11 +12586,11 @@ div#notebook {
         <span class="n">interRight</span>    <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">slopeRight</span><span class="o">*</span><span class="n">srcTop</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">srcTop</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">ptBottomLeft</span>  <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">interLeft</span><span class="p">)</span><span class="o">/</span><span class="n">slopeLeft</span><span class="p">),</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
         <span class="n">ptBottomRight</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">interRight</span><span class="p">)</span><span class="o">/</span><span class="n">slopeRight</span><span class="p">),</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">ptTopLeft</span>     <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">85</span><span class="o">-</span><span class="n">interLeft</span><span class="p">)</span><span class="o">/</span><span class="n">slopeLeft</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">85</span><span class="p">)]</span>
-        <span class="n">ptTopRight</span>    <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">85</span><span class="o">-</span><span class="n">interRight</span><span class="p">)</span><span class="o">/</span><span class="n">slopeRight</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">85</span><span class="p">)]</span>
+        <span class="n">ptTopLeft</span>     <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">140</span><span class="o">-</span><span class="n">interLeft</span><span class="p">)</span><span class="o">/</span><span class="n">slopeLeft</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">140</span><span class="p">)]</span>
+        <span class="n">ptTopRight</span>    <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">((</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">140</span><span class="o">-</span><span class="n">interRight</span><span class="p">)</span><span class="o">/</span><span class="n">slopeRight</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">140</span><span class="p">)]</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">([</span><span class="n">ptTopLeft</span><span class="p">,</span><span class="n">ptBottomLeft</span><span class="p">,</span><span class="n">ptBottomRight</span><span class="p">,</span><span class="n">ptTopRight</span><span class="p">])</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">CheckSourcePoints</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="n">image</span><span class="p">)</span>
-        
+    
     <span class="k">return</span> <span class="n">src</span>
 </pre></div>
 
@@ -12573,13 +12654,42 @@ div#notebook {
 <span class="sd">    This function estimates the destination points where the four corners in the original image </span>
 <span class="sd">    will map to in the warped image</span>
 <span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="n">offset</span> <span class="o">=</span> <span class="mi">25</span>
+    <span class="c1">#offset = 25</span>
+    <span class="c1">#img_size = image.shape</span>
+    <span class="c1">#dst = np.float32([[offset, offset], </span>
+    <span class="c1">#                  [offset, img_size[0]-offset], </span>
+    <span class="c1">#                  [img_size[1]-offset, img_size[0]-offset], </span>
+    <span class="c1">#                  [img_size[1]-offset, offset]])</span>
+    
     <span class="n">img_size</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">([[</span><span class="n">offset</span><span class="p">,</span> <span class="n">offset</span><span class="p">],</span> 
-                      <span class="p">[</span><span class="n">offset</span><span class="p">,</span> <span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">offset</span><span class="p">],</span> 
-                      <span class="p">[</span><span class="n">img_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">offset</span><span class="p">,</span> <span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">offset</span><span class="p">],</span> 
-                      <span class="p">[</span><span class="n">img_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">offset</span><span class="p">,</span> <span class="n">offset</span><span class="p">]])</span>
+    <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">([[</span><span class="mi">240</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">240</span><span class="p">,</span><span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]],[</span><span class="mi">1040</span><span class="p">,</span><span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]],[</span><span class="mi">1040</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+    
     <span class="k">return</span> <span class="n">dst</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Horizontal-Shift-Function">Horizontal Shift Function<a class="anchor-link" href="#Horizontal-Shift-Function">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">shiftHorizontally</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">pos</span><span class="p">):</span>
+    <span class="n">new_image</span> <span class="o">=</span> <span class="n">image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">new_image</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">new_image</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">pos</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_image</span>
 </pre></div>
 
 </div>
@@ -12608,16 +12718,30 @@ div#notebook {
     <span class="n">undistorted</span> <span class="o">=</span> <span class="n">UndistortImage</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
     
     <span class="c1"># Use color transforms, gradients, etc., to create a thresholded binary image.</span>
-    <span class="n">color_thresh</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">180</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
-    <span class="n">grad_mag_thresh</span> <span class="o">=</span> <span class="p">(</span><span class="mi">85</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
-    <span class="n">grad_dir_thresh</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
-    
-    <span class="n">color_binary</span>    <span class="o">=</span> <span class="n">ColorThresholdingHLS</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="n">color_thresh</span><span class="p">)</span>
-    <span class="n">grad_mag_binary</span> <span class="o">=</span> <span class="n">GradientMagThreshold</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">grad_mag_thresh</span><span class="p">)</span>
-    <span class="n">grad_dir_binary</span> <span class="o">=</span> <span class="n">GradientDirThreshold</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">grad_dir_thresh</span><span class="p">)</span>
+    <span class="n">color_thresh_hls</span> <span class="o">=</span> <span class="p">(</span><span class="mi">180</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>    
+    <span class="n">color_thresh_luv</span> <span class="o">=</span> <span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">color_thresh_lab</span> <span class="o">=</span> <span class="p">(</span><span class="mi">155</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+    <span class="n">grad_mag_thresh</span>  <span class="o">=</span> <span class="p">(</span><span class="mi">85</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">grad_dir_thresh</span>  <span class="o">=</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+
+    <span class="n">color_binary_hls</span> <span class="o">=</span> <span class="n">ColorThresholdingHLS</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="n">color_thresh_hls</span><span class="p">)</span>
+    <span class="n">color_binary_luv</span> <span class="o">=</span> <span class="n">ColorThresholdingLUV</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="n">color_thresh_luv</span><span class="p">)</span>
+    <span class="n">color_binary_lab</span> <span class="o">=</span> <span class="n">ColorThresholdingLAB</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="n">color_thresh_lab</span><span class="p">)</span>
+    <span class="n">grad_mag_binary</span>  <span class="o">=</span> <span class="n">GradientMagThreshold</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">grad_mag_thresh</span><span class="p">)</span>
+    <span class="n">grad_dir_binary</span>  <span class="o">=</span> <span class="n">GradientDirThreshold</span><span class="p">(</span><span class="n">undistorted</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">grad_dir_thresh</span><span class="p">)</span>
     
     <span class="c1">############# PLOT IMAGE ###########</span>
-    <span class="c1">#plt.imshow(color_binary,&#39;gray&#39;)</span>
+    <span class="c1">#plt.imshow(color_binary_hls,&#39;gray&#39;)</span>
+    <span class="c1">#plt.show()</span>
+    <span class="c1">####################################</span>
+
+    <span class="c1">############# PLOT IMAGE ###########</span>
+    <span class="c1">#plt.imshow(color_binary_luv,&#39;gray&#39;)</span>
+    <span class="c1">#plt.show()</span>
+    <span class="c1">####################################</span>
+
+    <span class="c1">############# PLOT IMAGE ###########</span>
+    <span class="c1">#plt.imshow(color_binary_lab,&#39;gray&#39;)</span>
     <span class="c1">#plt.show()</span>
     <span class="c1">####################################</span>
 
@@ -12632,14 +12756,30 @@ div#notebook {
     <span class="c1">####################################</span>
 
     <span class="c1"># Create composite binary image</span>
-    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">color_binary</span><span class="p">)</span>
-    <span class="c1">#combined[((color_binary == 1) &amp; (grad_mag_binary == 1) &amp; (grad_dir_binary == 1))] = 1</span>
-    <span class="n">combined</span><span class="p">[((</span><span class="n">color_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">grad_mag_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">color_binary_luv</span><span class="p">)</span>
+    <span class="n">combined</span><span class="p">[((</span><span class="n">color_binary_luv</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> \
+              <span class="p">(</span><span class="n">color_binary_lab</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> \
+              <span class="p">(</span><span class="n">grad_mag_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">1</span>
+
     
     <span class="c1">############# PLOT IMAGE ###########</span>
     <span class="c1">#plt.imshow(combined,&#39;gray&#39;)</span>
     <span class="c1">#plt.show()</span>
     <span class="c1">####################################</span>
+    
+    
+    <span class="c1">############# PLOT IMAGE ###########</span>
+    <span class="c1">#imshape = image.shape</span>
+    <span class="c1">#vertices = np.array([[(180,imshape[0]),</span>
+    <span class="c1">#                      (imshape[1]/2.0-60, imshape[0]/2.0+80), </span>
+    <span class="c1">#                      (imshape[1]/2.0+60, imshape[0]/2.0+80), </span>
+    <span class="c1">#                      (imshape[1]-25,imshape[0])]], dtype=np.int32)</span>
+    <span class="c1">#img = np.uint8(np.dstack((combined*255,combined*255,combined*255)))</span>
+    <span class="c1">#proj0 = cv2.polylines(img,np.int32([vertices]),1,(0,0,255),5) </span>
+    <span class="c1">#plt.imshow(img)</span>
+    <span class="c1">#plt.show()</span>
+    <span class="c1">####################################</span>
+     
     
     <span class="c1"># Apply the mask to remove landscape features that might interfere with the CV analysis</span>
     <span class="n">masked</span> <span class="o">=</span> <span class="n">ApplyMasking</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
@@ -12648,13 +12788,13 @@ div#notebook {
     <span class="c1">#plt.imshow(masked,&#39;gray&#39;)</span>
     <span class="c1">#plt.show()</span>
     <span class="c1">####################################</span>
-    
+     
     <span class="c1"># Apply a perspective transform to rectify binary image (&quot;birds-eye view&quot;).</span>
     <span class="n">src</span>  <span class="o">=</span> <span class="n">GetPerspectiveSourcePoints</span><span class="p">(</span><span class="n">masked</span><span class="p">)</span>
     <span class="n">dest</span> <span class="o">=</span> <span class="n">GetPerspectiveDestinationPoints</span><span class="p">(</span><span class="n">masked</span><span class="p">)</span>
 
     <span class="c1">#img = np.uint8(np.dstack((masked*255,masked*255,masked*255)))</span>
-    <span class="c1">#proj1 = cv2.polylines(img,np.int32([src]),1,(0,255,0),5) </span>
+    <span class="c1">#proj1 = cv2.polylines(img,np.int32([src]),1,(255,0,0),5) </span>
     
     <span class="c1">############# PLOT IMAGE ###########</span>
     <span class="c1">#plt.imshow(proj1)</span>
@@ -12674,9 +12814,18 @@ div#notebook {
     <span class="c1">#plt.imshow(warped,&#39;gray&#39;)</span>
     <span class="c1">#plt.show()</span>
     <span class="c1">####################################</span>
+    
+    <span class="c1"># Enhance the warped image knowing the lane lines are parallel</span>
+    <span class="n">warped_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">warped</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">warped_mask</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">warped_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">):]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">warped_masked</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">warped</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">warped_mask</span><span class="p">)</span>
+    <span class="n">warped_masked_shifted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">warped_masked</span><span class="p">)</span>
+    <span class="n">warped_masked_shifted</span> <span class="o">=</span> <span class="n">shiftHorizontally</span><span class="p">(</span><span class="n">warped_masked_shifted</span><span class="p">,</span><span class="mi">800</span><span class="p">)</span>
+    <span class="n">new_warped</span> <span class="o">=</span> <span class="n">warped_masked</span> <span class="o">|</span> <span class="n">warped_masked_shifted</span>
+    <span class="n">warped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_warped</span><span class="p">)</span>
 
     <span class="c1">#img = np.uint8(np.dstack((warped*255,warped*255,warped*255)))</span>
-    <span class="c1">#proj2 = cv2.polylines(img,np.int32([dest]),1,(0,255,0),5) </span>
+    <span class="c1">#proj2 = cv2.polylines(img,np.int32([dest]),1,(255,0,0),5) </span>
     
     <span class="c1">############# PLOT IMAGE ###########</span>
     <span class="c1">#plt.imshow(proj2)</span>
@@ -12687,8 +12836,9 @@ div#notebook {
     <span class="n">leftBaseX</span><span class="p">,</span> <span class="n">rightBaseX</span> <span class="o">=</span> <span class="n">FindLaneLineStart</span><span class="p">(</span><span class="n">warped</span><span class="p">)</span>
     
     <span class="c1"># Track lane lines with the method of sliding windows</span>
+    <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">left_lane_inds</span><span class="p">,</span><span class="n">right_lane_inds</span><span class="p">,</span><span class="n">nonzerox</span><span class="p">,</span><span class="n">nonzeroy</span><span class="p">,</span><span class="n">leftx</span><span class="p">,</span><span class="n">lefty</span><span class="p">,</span><span class="n">rightx</span><span class="p">,</span><span class="n">righty</span><span class="p">,</span><span class="n">out_img</span> <span class="o">=</span> \
-    <span class="n">TrackSlidingWindows</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">warped</span><span class="p">,</span><span class="n">leftBaseX</span><span class="p">,</span><span class="n">rightBaseX</span><span class="p">)</span>
+    <span class="n">TrackSlidingWindows</span><span class="p">(</span><span class="n">n_windows</span><span class="p">,</span><span class="n">warped</span><span class="p">,</span><span class="n">leftBaseX</span><span class="p">,</span><span class="n">rightBaseX</span><span class="p">)</span>
     
     <span class="c1"># Fit a polynomial expression to the lane line points</span>
     <span class="n">left_fit</span><span class="p">,</span><span class="n">right_fit</span><span class="p">,</span><span class="n">left_fitx</span><span class="p">,</span><span class="n">right_fitx</span><span class="p">,</span><span class="n">ploty</span> <span class="o">=</span> \
@@ -12823,9 +12973,8 @@ div#notebook {
 <span class="c1">## To do so add .subclip(start_second,end_second) to the end of the line below</span>
 <span class="c1">## Where start_second and end_second are integer values representing the start and end of the subclip</span>
 <span class="c1">## You may also uncomment the following line for a subclip of the first 5 seconds</span>
-<span class="c1">##clip1 = VideoFileClip(&quot;test_videos/solidWhiteRight.mp4&quot;).subclip(0,5)</span>
 <span class="n">clip</span> <span class="o">=</span> <span class="n">VideoFileClip</span><span class="p">(</span><span class="s2">&quot;./project_video.mp4&quot;</span><span class="p">)</span>
-<span class="c1">#clip = VideoFileClip(&quot;./project_video.mp4&quot;).subclip(0,30)</span>
+<span class="c1">#clip = VideoFileClip(&quot;./project_video.mp4&quot;).subclip(0,5)</span>
 <span class="n">new_clip</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">fl_image</span><span class="p">(</span><span class="n">ImageProcessPipeline</span><span class="p">)</span> <span class="c1">#NOTE: this function expects color images!!</span>
 </pre></div>
 
@@ -12841,6 +12990,19 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">new_output</span> <span class="o">=</span> <span class="s1">&#39;./project_video_output.mp4&#39;</span>
 <span class="o">%</span><span class="k">time</span> new_clip.write_videofile(new_output, audio=False)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
 </div>
