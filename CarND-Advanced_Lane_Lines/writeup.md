@@ -28,7 +28,7 @@ The goals / steps of this project are the following:
 [image7]: ./output_images/test4.png "Camera Calibration ex.4"
 [image8]: ./output_images/test5.png "Camera Calibration ex.5"
 [image9]: ./output_images/test6.png "Camera Calibration ex.6"
-[image10]: ./output_images/color_binary.png "Color Binary"
+[image10]: ./output_images/color_binary_hls.png "Color Binary HLS"
 [image11]: ./output_images/grad_mag_binary.png "Gradient Magnitude Binary"
 [image12]: ./output_images/grad_dir_binary.png "Gradient Direction Binary"
 [image13]: ./output_images/combined_binary.png "Combined Binary"
@@ -39,8 +39,11 @@ The goals / steps of this project are the following:
 [image18]: ./output_images/polynom_fit_1.png "Polynomial Fit"
 [image19]: ./output_images/polynom_fit_2.png "Polynomial Fit"
 [image20]: ./output_images/final.png "Final Output Image"
-[image21]: ./output_images/perspect_before_short.png "Before Perspective Transformation"
-[image22]: ./output_images/error.png "Error Before Termination"
+[image22]: ./output_images/color_binary_luv.png "Color Binary LUV"
+[image23]: ./output_images/color_binary_lab.png "Color Binary LAB"
+[image24]: ./output_images/combined_binary_with_mask.png "Combined Binary With The Masked ROI"
+[image25]: ./output_images/duplicating_left_line.png "Duplicate Left Line"
+[image26]: ./output_images/perspect_after_2.png "Perspective Transformation With Duplicated Left Line On The Right"
 
 [video1]: ./project_video_output.mp4 "Video"
 
@@ -81,25 +84,31 @@ Additional examples of calibration follow below.  The original images were provi
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image.  Three separate binaries were generated: color, gradient magnitude and gradient direction.  
+I used a combination of color and gradient thresholds to generate a binary image.  Five separate binaries were generated: color (HLS/LUV/LAB), gradient magnitude and gradient direction.  
 
 ```python
-    color_binary    = ColorThresholdingHLS(undistorted, color_thresh)
-    grad_mag_binary = GradientMagThreshold(undistorted, 3, grad_mag_thresh)
-    grad_dir_binary = GradientDirThreshold(undistorted, 3, grad_dir_thresh)
+    color_binary_hls = ColorThresholdingHLS(undistorted, color_thresh_hls)
+    color_binary_luv = ColorThresholdingLUV(undistorted, color_thresh_luv)
+    color_binary_lab = ColorThresholdingLAB(undistorted, color_thresh_lab)
+    grad_mag_binary  = GradientMagThreshold(undistorted, 3, grad_mag_thresh)
+    grad_dir_binary  = GradientDirThreshold(undistorted, 3, grad_dir_thresh)
 ```
 
 The min/max thresholds were the following respectively.
 
 ```python
-   color_thresh = (180, 255)
-   grad_mag_thresh = (85, 255)
-   grad_dir_thresh = (0.9, 1.1)
+    color_thresh_hls = (180, 255)    
+    color_thresh_luv = (225, 255)
+    color_thresh_lab = (155, 200)
+    grad_mag_thresh  = (85, 255)
+    grad_dir_thresh  = (0.9, 1.1)
 ```
 
-The color thresholding is implemented in the function `ColorThresholdingHLS()`.  The color space is converted from RGB to HLS and the image is subsequently thresholded into a binary image.
+The color thresholding is implemented in the functions `ColorThresholdingHLS()`, `ColorThresholdingLUV()`, `ColorThresholdingLAB()`.  The color space is converted from RGB to HLS/LUV/LAB and the image is subsequently thresholded into a binary image.
 
 ![alt text][image10]
+![alt text][image22]
+![alt text][image23]
 
 The gradient magnitude thresholding is implemented in the `GradientMagThreshold()` function.  A Sobel operator in the x direction is implemented, scaled and thresholded.
 
@@ -109,13 +118,17 @@ The gradient direction thresholding in `GradientDirThreshold()` didn't pay off a
 
 ![alt text][image12]
 
-Given that the color and gradient magnitude binaries have had the most useful results, those two were used to produce a combined binary image.
+Given that the LUV/LAB color and the gradient magnitude binaries have had the most useful results, those three were used to produce a combined binary image.
 
 ```python
-combined[((color_binary == 1) | (grad_mag_binary == 1))] = 1
+    combined[((color_binary_luv == 1) | \
+              (color_binary_lab == 1) | \
+              (grad_mag_binary == 1))] = 1
+
 ```
 
 ![alt text][image13]
+![alt text][image24]
 
 Subsequently, the combined binary image is fed into a masking function to remove landscape and other undesired details.
 
@@ -133,8 +146,6 @@ The two basic functions that prepare the data before the perspective transformat
 
 The first one gets four source points in the original image and the second one chooses four points in the destination image where the previous points will map to.  An example of selected source points in the original image is shown below.
 
-![alt text][image21]
-
 The selected top and bottom points that form the trapezoidal are extrapolated to the top and bottom of the visible binary image.
 
 ![alt text][image15]
@@ -142,6 +153,14 @@ The selected top and bottom points that form the trapezoidal are extrapolated to
 The destination points are selected as the corners of a rectange that includes most of the pixel space in the destination image.
 
 ![alt text][image16]
+
+Then, the left lane line is duplicated and it replaces the decimated right lane line.
+
+![alt text][image25]
+
+The source points are projected to the destination points below.
+
+![alt text][image26]
 
 Then, by computing the transformation matrix, the image is warped successfully using the OpenCV `cv2.getPerspectiveTransform()` and `cv2.warpPerspective()` functions.
 
@@ -158,7 +177,7 @@ Then, by computing the transformation matrix, the image is warped successfully u
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-This is done in the `FindLaneLineStart()` and `TrackSlidingWindows()` functions.  A historgram is used on the warped image to identify the x pixel coordinates of the line starting points.  Then, a method was implemented same as the one in the lectures to use sliding tiles or rectangles or windows to track the lines to the top end.
+This is done in the `FindLaneLineStart()` and `TrackSlidingWindows()` functions.  A historgram is used on the warped image to identify the x pixel coordinates of the line starting points.  Then, a method was implemented same as the one in the lectures to use sliding tiles or rectangles or windows to track the lines to the top end.  In the code, for the right lane line, the duplicated left line is used to provide better fitting results.
 
 ![alt text][image17]
 
@@ -185,7 +204,7 @@ At the end of the pipeline and following an inverse perspective transformation, 
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_output.mp4)
 
 ---
 
@@ -193,8 +212,6 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Besides the wobbly lane boundary lines in some cases, the main issue is that the algorithm process the first 30 seconds of the video and then terminates abnormally.  So far, this is not rersolved.  It is expected that the cause is a data type conflict.  Fixing it is an on-going effort, although no progress has been made recently.  See below for error message.
-
-![alt text][image22]
+This was a challenging project.  The most critical part was to produce a binary image where the lane lines would appear as clearly as possible despite tree shadows, marked pavement and other external factors.  To improve, I would explore additional color spaces and various thresholds until a satisfying binary image is at hand.  Perhaps, additional error checks would be needed to improve the performance and tolerance of the algorithm --especially on the challenging roads.  Averaging detections over a number of frames would also smooth out the lines and counter-offset a bad line detection.
 
 
