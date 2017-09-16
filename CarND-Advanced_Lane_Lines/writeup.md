@@ -42,7 +42,6 @@ The goals / steps of this project are the following:
 [image22]: ./output_images/color_binary_luv.png "Color Binary LUV"
 [image23]: ./output_images/color_binary_lab.png "Color Binary LAB"
 [image24]: ./output_images/combined_binary_with_mask.png "Combined Binary With The Masked ROI"
-[image25]: ./output_images/duplicating_left_line.png "Duplicate Left Line"
 [image26]: ./output_images/perspect_after_2.png "Perspective Transformation With Duplicated Left Line On The Right"
 
 [video1]: ./project_video_output.mp4 "Video"
@@ -154,10 +153,6 @@ The destination points are selected as the corners of a rectange that includes m
 
 ![alt text][image16]
 
-Then, the left lane line is duplicated and it replaces the decimated right lane line.
-
-![alt text][image25]
-
 The source points are projected to the destination points below.
 
 ![alt text][image26]
@@ -184,7 +179,6 @@ This is done in the `FindLaneLineStart()` and `TrackSlidingWindows()` functions.
 Then, given the points, polynomials of the form Ay<sup>2</sup>+By+C are fitted to the lines.  The fitting takes place in the `FitPolynomialToSlidingWindows()` function.
 
 ![alt text][image18]
-![alt text][image19]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
